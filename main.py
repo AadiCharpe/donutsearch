@@ -4,13 +4,12 @@ from bs4 import BeautifulSoup
 import requests
 # starting urls
 urls = ['https://www.wikipedia.org/', 'https://www.cnn.com/']
-
+# visited urls
 visited = []
-number = 3
-# number > 0 is just because I am testing
-while urls and number > 0:
+while urls:
     url = urls.pop()
     print('crawling: ' + url)
+    # check robots.txt file to see if I can visit url
     canVisit = True
     response = requests.get('https://' + urlparse(url).netloc + '/robots.txt')
     disallowed = []
@@ -24,6 +23,7 @@ while urls and number > 0:
     if not canVisit:
         print('cant crawl ' + url + ' because of robots.txt')
         continue
+    # find hyperlinks on website
     soup = BeautifulSoup(requests.get(url).content, 'html.parser')
     for link in soup.find_all('a'):
         if link.get('href').startswith('//'):
@@ -33,6 +33,6 @@ while urls and number > 0:
             if link.get('href') not in visited:
                 urls.append(link.get('href'))
     visited.append(url)
-    number -= 1
+    # sleep so websites cant tell it's a bot
     time.sleep(1.5)
-print(visited)
+print('all urls visited: ' + visited)
