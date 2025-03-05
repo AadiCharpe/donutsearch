@@ -3,11 +3,11 @@ from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 import requests
 # starting urls
-urls = ['https://www.wikipedia.org/']
+urls = ['https://www.wikipedia.org/', 'https://www.youtube.com/', 'https://www.cnn.com/']
 # visited urls
 visited = []
 while urls:
-    url = urls.pop()
+    url = urls.pop(0)
     print('crawling: ' + url)
     # check robots.txt file to see if I can visit url
     canVisit = True
