@@ -2,10 +2,18 @@ import time
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 import requests
-# starting urls
-urls = ['https://www.wikipedia.org/', 'https://www.youtube.com/', 'https://www.cnn.com/']
-# visited urls
-visited = []
+# read info from file
+f = open('index.txt', 'r')
+lines = f.readlines()
+f.close()
+urls = lines[0].split('|')
+
+visited = lines[1].split('|')
+words = {}
+for i in range(2, len(lines)):
+    line = lines[i].split('|')
+    words[line[0]] = line[1]
+pages = 1
 while urls:
     url = urls.pop(0)
     print('crawling: ' + url)
@@ -38,6 +46,25 @@ while urls:
             elif link.get('href').startswith('http'):
                 if link.get('href') not in visited:
                     urls.append(link.get('href'))
+    # scrape the text on the website
+    texts = soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p'])
+    for t in texts:
+        text = t.get_text(strip=True)
+        if text in words and url not in words[text].split(','):
+            words[text] += ',' + url
+        else:
+            words[text] = url
+    # save to file every 25 pages
+    if pages % 25 == 0:
+        pages = 1
+        f = open('index.txt', 'w', encoding="utf-8")
+        f.write('|'.join(urls) + '\n')
+        f.write('|'.join(visited) + '\n')
+        for key in words.keys():
+            f.write(key + '|' + words[key] + '\n')
+        print('data saved')
+        f.close()
     visited.append(url)
     # sleep so websites cant tell it's a bot
     time.sleep(1.5)
+    pages += 1
