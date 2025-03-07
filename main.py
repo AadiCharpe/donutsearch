@@ -50,12 +50,15 @@ while urls:
     texts = soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p'])
     for t in texts:
         text = t.get_text(strip=True)
-        if text in words and url not in words[text].split(','):
-            words[text] += ',' + url
-        else:
-            words[text] = url
+        for word in text.split():
+            lower = word.lower()
+            if len(lower) > 0 and lower.isalpha():
+                if lower in words and url not in words[lower].split(','):
+                    words[lower] += ',' + url
+                else:
+                    words[lower] = url
     # save to file every 25 pages
-    if pages % 25 == 0:
+    if pages % 5 == 0:
         pages = 1
         f = open('index.txt', 'w', encoding="utf-8")
         f.write('|'.join(urls) + '\n')
