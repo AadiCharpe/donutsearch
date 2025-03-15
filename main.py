@@ -9,6 +9,8 @@ f.close()
 urls = lines[0].split('|')
 
 visited = lines[1].split('|')
+if visited[0] == '\n':
+    visited.clear()
 words = {}
 for i in range(2, len(lines)):
     line = lines[i].split('|')
@@ -61,8 +63,8 @@ while urls:
     if pages % 5 == 0:
         pages = 1
         f = open('index.txt', 'w', encoding="utf-8")
-        f.write('|'.join(urls) + '\n')
-        f.write('|'.join(visited) + '\n')
+        f.write('|'.join(urls))
+        f.write('|'.join(visited))
         for key in words.keys():
             f.write(key + '|' + words[key] + '\n')
         print('data saved')
