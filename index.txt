@@ -1,2 +1,2 @@
-https://www.cnn.com|https://www.example.com/
+https://www.cnn.com|https://en.wikipedia.org/wiki/Google|
 
