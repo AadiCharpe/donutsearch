@@ -16,7 +16,9 @@ for i in range(2, len(lines)):
     line = lines[i].split('|')
     words[line[0]] = line[1]
 pages = 1
-while urls:
+cd = ''
+# limit of 100 pages per domain so my pc doesn't explode
+while urls and pages <= 100:
     url = urls.pop(0)
     print('crawling: ' + url)
     # check robots.txt file to see if I can visit url
@@ -38,6 +40,8 @@ while urls:
     if not canVisit:
         print('cant crawl ' + url + ' because of robots.txt')
         continue
+    if urlparse(url).netloc != cd:
+        pages = 1
     # find hyperlinks on website
     soup = BeautifulSoup(requests.get(url).content, 'html.parser')
     for link in soup.find_all('a'):
@@ -60,8 +64,7 @@ while urls:
                 else:
                     words[lower] = url
     # save to file every 25 pages
-    if pages % 5 == 0:
-        pages = 1
+    if pages % 25 == 0:
         f = open('index.txt', 'w', encoding="utf-8")
         f.write('|'.join(urls))
         f.write('|'.join(visited))
@@ -70,6 +73,7 @@ while urls:
         print('data saved')
         f.close()
     visited.append(url)
+    cd = urlparse(url).netloc
     # sleep so websites cant tell it's a bot
     time.sleep(1.5)
     pages += 1
