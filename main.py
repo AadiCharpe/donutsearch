@@ -13,15 +13,12 @@ if visited[0] == '\n':
     visited.clear()
 words = {}
 for i in range(2, len(lines)):
-    line = lines[i].split('|')
-    words[line[0]] = line[1]
+    aline = lines[i].split('|')
+    words[aline[0]] = aline[1]
 pages = 1
 cd = ''
-# limit of 100 pages per domain so my pc doesn't explode
-while urls and pages <= 100:
-    url = urls.pop(0)
-    print('crawling: ' + url)
-    # check robots.txt file to see if I can visit url
+
+def crawlable(url):
     canVisit = True
     relevant = False
     response = requests.get(urlparse(url).scheme + '://' + urlparse(url).netloc + '/robots.txt')
@@ -39,10 +36,10 @@ while urls and pages <= 100:
             break
     if not canVisit:
         print('cant crawl ' + url + ' because of robots.txt')
-        continue
-    if urlparse(url).netloc != cd:
-        pages = 1
-    # find hyperlinks on website
+    return canVisit
+
+def index(url):
+    # find all hyperlinks on page
     soup = BeautifulSoup(requests.get(url).content, 'html.parser')
     for link in soup.find_all('a'):
         if link.get('href') is not None:
@@ -52,7 +49,7 @@ while urls and pages <= 100:
             elif link.get('href').startswith('http'):
                 if link.get('href') not in visited:
                     urls.append(link.get('href'))
-    # scrape the text on the website
+    # scrape the text on the page
     texts = soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p'])
     for t in texts:
         text = t.get_text(strip=True)
@@ -63,6 +60,19 @@ while urls and pages <= 100:
                     words[lower] += ',' + url
                 else:
                     words[lower] = url
+
+# limit of 100 pages per domain so my pc doesn't explode
+while urls and pages <= 100:
+    url = urls.pop(0)
+    print('crawling: ' + url)
+    # check robots.txt file to see if I can visit url
+    if not crawlable(url):
+        continue
+    # reset page limit if new domain
+    if urlparse(url).netloc != cd:
+        pages = 1
+    # index the page
+    index(url)
     # save to file every 25 pages
     if pages % 25 == 0:
         f = open('index.txt', 'w', encoding="utf-8")
