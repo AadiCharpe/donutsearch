@@ -9,6 +9,8 @@ lines = f.readlines()
 f.close()
 tlist1 = lines[0].split('|')[0].split(',')
 tlist2 = lines[0].split('|')[1].split(',')
+tlist3 = lines[0].split('|')[2].split(',')
+tlist4 = lines[0].split('|')[3].split(',')
 
 visited = lines[1].split('|')
 if visited[0] == '\n':
@@ -103,9 +105,15 @@ def crawl(urlist, id):
 
 t1 = threading.Thread(target=crawl, args=(tlist1, 1,))
 t2 = threading.Thread(target=crawl, args=(tlist2, 2,))
+t3 = threading.Thread(target=crawl, args=(tlist3, 3,))
+t4 = threading.Thread(target=crawl, args=(tlist4, 4,))
 
 t1.start()
 t2.start()
+t3.start()
+t4.start()
 
 t1.join()
 t2.join()
+t3.join()
+t4.join()

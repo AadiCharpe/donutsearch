@@ -18,7 +18,7 @@ l.place(x=300, y=140, anchor='n')
 def search():
     l.config(text='')
     text = example.get().split()
-    f = open('index.txt', 'r')
+    f = open('index.txt', 'r', encoding='utf-8')
     lines = f.readlines()[1:]
     f.close()
     words = {}
