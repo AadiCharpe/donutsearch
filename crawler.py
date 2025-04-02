@@ -62,7 +62,7 @@ def index(url, urlist):
             if newlink not in visited and valid(newlink):
                 urlist.append(newlink)
     # scrape the text on the page
-    texts = soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p'])
+    texts = soup.find_all(['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'a'])
     for t in texts:
         text = t.get_text(strip=True)
         for word in text.split():
@@ -91,7 +91,7 @@ def crawl(urlist, id):
         # save to file every 10 pages
         if pages % 3 == 0:
             f = open('index.txt', 'w', encoding="utf-8")
-            f.write('|'.join([','.join(tlist1), ','.join(tlist2)]))
+            f.write('|'.join([','.join(tlist1), ','.join(tlist2), ','.join(tlist3), ','.join(tlist4)]) + '\n')
             f.write('|'.join(visited))
             for key in words.keys():
                 f.write(key + '|' + words[key] + '\n')
