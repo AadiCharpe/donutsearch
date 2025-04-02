@@ -3,6 +3,7 @@ from urllib.parse import urlparse
 from bs4 import BeautifulSoup
 import requests
 import threading
+import re
 # read info from file
 f = open('index.txt', 'r')
 lines = f.readlines()
@@ -69,7 +70,7 @@ def index(url, urlist):
         text = t.get_text(strip=True)
         for word in text.split():
             lower = word.lower()
-            if len(lower) > 0 and lower.isalpha():
+            if len(lower) > 0 and re.fullmatch(r'^[a-zA-Z]+$', lower):
                 if lower in words and url not in words[lower].split(','):
                     words[lower] += ',' + url
                 else:
