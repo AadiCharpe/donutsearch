@@ -19,7 +19,7 @@ def search():
     l.config(text='')
     text = example.get().split()
     f = open('index.txt', 'r', encoding='utf-8')
-    lines = f.readlines()[1:]
+    lines = f.readlines()[2:]
     f.close()
     words = {}
     for line in lines:

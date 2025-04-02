@@ -59,6 +59,8 @@ def index(url, urlist):
                 newlink = urlparse(url).netloc + newlink
             elif not newlink.startswith('http'):
                 continue
+            if '.wikipedia.org' in newlink and 'en.wikipedia.org' not in newlink:
+                continue
             if newlink not in visited and valid(newlink):
                 urlist.append(newlink)
     # scrape the text on the page
