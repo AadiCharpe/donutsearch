@@ -5,17 +5,24 @@ import requests
 import threading
 import re
 # read info from file
-f = open('index.txt', 'r')
-lines = f.readlines()
-f.close()
+fl = open('index.txt', 'r')
+lines = fl.readlines()
+fl.close()
 tlist1 = lines[0].split('|')[0].split(',')
 tlist2 = lines[0].split('|')[1].split(',')
 tlist3 = lines[0].split('|')[2].split(',')
 tlist4 = lines[0].split('|')[3].split(',')
 
-visited = lines[1].split('|')
-if visited[0] == '\n':
-    del visited[0]
+visited = {}
+u = ''
+for value in lines[1].split('#'):
+    if value.startswith('http'):
+        u = value
+    else:
+        visited[u] = value
+        u = ''
+if '' in visited:
+    del visited['']
 words = {}
 for i in range(2, len(lines)):
     aline = lines[i].split('|')
@@ -75,12 +82,19 @@ def index(url, urlist):
                     words[lower] += ',' + url
                 else:
                     words[lower] = url
+    meta = soup.find('meta', attrs={'name': 'description'})
+    tt = soup.find('title')
+    title = tt.get_text().strip() if tt else 'No Title'
+    description = ''
+    if meta and 'content' in meta.attrs:
+        description = meta['content']
+    return f'{title},{description}'
 
 def crawl(urlist, id):
     pages = 1
     cd = ''
-    # limit of 100 pages per domain so my pc doesn't explode
-    while urlist and pages <= 100:
+    # limit of 15 pages per domain
+    while urlist and pages <= 15:
         url = urlist.pop(0)
         print(f'thread {id} crawling: {url}')
         # check robots.txt file to see if I can visit url
@@ -90,17 +104,20 @@ def crawl(urlist, id):
         if urlparse(url).netloc != cd:
             pages = 1
         # index the page
-        index(url, urlist)
-        # save to file every 10 pages
+        info = index(url, urlist)
+        # save to file every 5 pages
         if pages % 3 == 0:
             f = open('index.txt', 'w', encoding="utf-8")
             f.write('|'.join([','.join(tlist1), ','.join(tlist2), ','.join(tlist3), ','.join(tlist4)]) + '\n')
-            f.write('|'.join(visited))
+            string = ''
+            for k, v in visited.items():
+                string += f'{k}#{v}#'
+            f.write(string[:-1])
             for key in words.keys():
                 f.write(key + '|' + words[key] + '\n')
             print('data saved')
             f.close()
-        visited.append(url)
+        visited[url] = info
         cd = urlparse(url).netloc
         # sleep so websites cant tell it's a bot
         time.sleep(2)
