@@ -15,7 +15,7 @@ tlist4 = lines[0].split('|')[3].split(',')
 
 visited = {}
 u = ''
-for value in lines[1].split('#'):
+for value in lines[1].split('~'):
     if value.startswith('http'):
         u = value
     else:
@@ -88,7 +88,7 @@ def index(url, urlist):
     description = ''
     if meta and 'content' in meta.attrs:
         description = meta['content']
-    return f'{title},{description}'
+    return f'{title}`{description}'
 
 def crawl(urlist, id):
     pages = 1
@@ -104,24 +104,23 @@ def crawl(urlist, id):
         if urlparse(url).netloc != cd:
             pages = 1
         # index the page
-        info = index(url, urlist)
-        # save to file every 5 pages
-        if pages % 3 == 0:
-            f = open('index.txt', 'w', encoding="utf-8")
-            f.write('|'.join([','.join(tlist1), ','.join(tlist2), ','.join(tlist3), ','.join(tlist4)]) + '\n')
-            string = ''
-            for k, v in visited.items():
-                string += f'{k}#{v}#'
-            f.write(string[:-1])
-            for key in words.keys():
-                f.write(key + '|' + words[key] + '\n')
-            print('data saved')
-            f.close()
-        visited[url] = info
+        visited[url] = index(url, urlist)
         cd = urlparse(url).netloc
         # sleep so websites cant tell it's a bot
         time.sleep(2)
         pages += 1
+        # save to file every 5 pages
+        if pages % 2 == 0:
+            f = open('index.txt', 'w', encoding="utf-8")
+            f.write('|'.join([','.join(tlist1), ','.join(tlist2), ','.join(tlist3), ','.join(tlist4)]) + '\n')
+            string = ''
+            for k, v in visited.items():
+                string += f'{k}~{v}~'
+            f.write(string[:-1] + '\n')
+            for key in words.keys():
+                f.write(key + '|' + words[key] + '\n')
+            print('data saved')
+            f.close()
 
 t1 = threading.Thread(target=crawl, args=(tlist1, 1,))
 t2 = threading.Thread(target=crawl, args=(tlist2, 2,))
