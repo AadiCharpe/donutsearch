@@ -1,4 +1,5 @@
 import tkinter
+import webbrowser
 
 app = tkinter.Tk()
 
@@ -9,7 +10,7 @@ app.resizable(False, False)
 example = tkinter.Entry(width=25, font=('',20))
 example.place(x=300, y=30, anchor=tkinter.CENTER)
 
-b = tkinter.Button(text='Search', width=15, height=1, command=lambda:search())
+b = tkinter.Button(text='Search', width=15, height=1, command=lambda: search())
 b.place(x=300, y=100, anchor=tkinter.CENTER)
 
 l = tkinter.Text(font=('',12), state=tkinter.DISABLED)
@@ -34,7 +35,6 @@ if '' in info:
 def search():
     l.config(state=tkinter.NORMAL)
     l.delete('1.0', 'end')
-    l.config(state=tkinter.DISABLED)
     text = example.get().lower().split()
     matches = {}
     # find all matches
@@ -48,15 +48,17 @@ def search():
         for t in text:
             if t in words and key in words[t].split(','):
                 matches[key] += 1
-    newtext = ''
+    l.config(state=tkinter.NORMAL, wrap=tkinter.WORD)
     # sort the dictionary
     sorted_items = sorted([(value, key) for key, value in matches.items()])
+    # add to text area
     for val, key in reversed(sorted_items):
         if key.endswith('\n'):
             key = key[:-1]
-        newtext += f"{info[key].split('`')[0]} - {key}\n{info[key].split('`')[1]}\n"
-    l.config(state=tkinter.NORMAL, wrap=tkinter.WORD)
-    l.insert('1.0', newtext)
+        l.insert('end', f"{info[key].split('`')[0]}", f'link{key}')
+        l.insert('end', f" - {key}\n{info[key].split('`')[1]}\n")
+        l.tag_config(f'link{key}', foreground='blue')
+        l.tag_bind(f'link{key}', '<Button-1>', lambda e, key=key: webbrowser.open(key))
     l.config(state=tkinter.DISABLED)
 
 app.mainloop()
