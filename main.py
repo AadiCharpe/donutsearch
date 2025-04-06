@@ -13,7 +13,7 @@ example.place(x=300, y=30, anchor=tkinter.CENTER)
 b = tkinter.Button(text='Search', width=15, height=1, command=lambda: search())
 b.place(x=300, y=100, anchor=tkinter.CENTER)
 
-l = tkinter.Text(font=('',12), state=tkinter.DISABLED)
+l = tkinter.Text(font=('Sanserif',13), state=tkinter.DISABLED)
 l.pack(fill=tkinter.X, side=tkinter.BOTTOM)
 # read index file
 f = open('index.txt', 'r', encoding='utf-8')
@@ -56,8 +56,11 @@ def search():
         if key.endswith('\n'):
             key = key[:-1]
         l.insert('end', f"{info[key].split('`')[0]}", f'link{key}')
-        l.insert('end', f" - {key}\n{info[key].split('`')[1]}\n")
+        l.insert('end', f" - {key}\n", 'url')
+        l.insert('end', f"{info[key].split('`')[1]}\n", 'description')
         l.tag_config(f'link{key}', foreground='blue')
+        l.tag_config('description', font=('Sanserif',12), foreground='#323b3a')
+        l.tag_config('url', foreground='green')
         l.tag_bind(f'link{key}', '<Button-1>', lambda e, key=key: webbrowser.open(key))
     l.config(state=tkinter.DISABLED)
 
